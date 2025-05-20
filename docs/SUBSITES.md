@@ -13,19 +13,20 @@ Similar to entries of a database model, you can create fixtures from it to re-lo
 
 ## Load Prepared Subsites
 
-This project ships an example subsite configuration and provides fixtures for a subsite with a custom theme. In a terminal, run `python manage.py loaddata fixtures/subsite_leverkusen.json`.
+This project ships an example subsite configuration and provides fixtures for a subsite with a custom theme. In a terminal, run `python manage.py loaddata fixtures/subsite_red.json`.
 
 However, fixtures are a bit brittle to maintain over time.
 So use with care.
 Alternatively, use backup/restore once subsites are created. 
-Follow the next steps to create subsites manually.
+
+Follow the next steps to create a subsite manually.
 
 ## Manually Add a New Subsite
 
-In order to add a new subsite *subsite_name*:
+In order to add a new subsite *my_subsite*:
 
-1. Add a folder at `templates/subsites/*subsite_name*/`
-2. Create folders `*subsite_name*/templates/geonode-mapstore-client/snippets`
+1. Add a folder at `templates/subsites/my_subsite/`
+2. Create folders `my_subsite/templates/geonode-mapstore-client/snippets`
 3. For extending the base template file, add `snippets/custom_theme.html` (see theming guide linked above for details) or ovewrite individual section templates like `brand_navbar.html`, `footer.html` etc.
 4. In order for the subsite custom theming to take effect, it needs to be configured through Django admin panel at `http://{host}/admin`
 
@@ -35,16 +36,16 @@ In order to add a new subsite *subsite_name*:
 
 <img src="img/subsites/add_subsite.png" alt="add_subsite img" width="25%"/>
 
-6. Site name has to be *subsite_name* (just as the folder name). 
+6. Site name has to be *my_subsite* (just as the folder name). 
 
-<img src="img/subsites/subsite_name.png" alt="subsite name img" width="50%">
+<img src="img/subsites/my_subsite.png" alt="subsite name img" width="50%">
 
 7. Within the subsite settings, add a theme (any name)
 
 <img src="img/subsites/theme.png" alt="subsite theme img" width="50%">
 <img src="img/subsites/theme_name.png" alt="subsite theme name img" width="50%">
 
-8. Subsite should now be available at `http://{host}/*subsite_name*/`
+8. Subsite should now be available at `http://{host}/my_subsite/`
 
 
 ## Overridable or Inherit From Snippets
@@ -91,13 +92,16 @@ In the SubSite settings, the subentry `Theme` gives you options to change
 
 Follow these steps to configure navigation between subsites which are already available:
 
-1. In the admin panel, go to `Menus`. Add a new menu, set Title to `Subsites`, Placeholder to `TOPBAR_MENU_RIGHT`, Order to `2`.
+1. In the admin panel, go to `Menus`.
+   Add a new menu, set Title to `Subsites`, Placeholder to `TOPBAR_MENU_RIGHT`, Order to `2`.
 
     <img src="img/subsites/menus.png" alt="menus in the admin panel img" width="50%">
 
-2. In the admin panel, go to `Menu items`. Add two items. 
-First with a title `Parent Site`, menu specified to be `Subsites`, order `1` and URL to be `/`, leave `blank target` checkbox blank. Second should be titled "Leverkusen", have menu `Subsites`, URL `/leverkusen' and `blank target` also unchecked.
+2. In the admin panel, go to `Menu items`.
+    Add two items. 
+    First with a title `Parent Site`, menu specified to be `Subsites`, order `1` and URL to be `/`, leave `blank target` checkbox blank.
+    Second should be titled "red", have menu `Subsites`, URL `/red' and `blank target` also unchecked.
 
     <img src="img/subsites/menu-items.png" alt="menu items in the admin panel img" width="50%">
-
-The button would appear in the header on the right side of the catalogue page. 
+    
+Once everything is in place, the button appears on the right of the header of the catalogue page.
