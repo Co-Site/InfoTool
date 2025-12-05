@@ -1,2 +1,2 @@
 ARG BASE_IMAGE_VERSION
-FROM geonode/postgis:${BASE_IMAGE_VERSION}
+FROM geonode/postgis:${BASE_IMAGE_VERSION:-4.4.3}

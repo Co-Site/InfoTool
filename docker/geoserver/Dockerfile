@@ -1,5 +1,5 @@
 ARG BASE_IMAGE_VERSION
-FROM geonode/geoserver:${BASE_IMAGE_VERSION}
+FROM geonode/geoserver:${BASE_IMAGE_VERSION:-4.4.3}
 
 ## GeoServer plugins
 #

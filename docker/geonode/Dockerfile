@@ -1,5 +1,5 @@
 ARG BASE_IMAGE_VERSION
-FROM geonode/geonode:${BASE_IMAGE_VERSION}
+FROM geonode/geonode:${BASE_IMAGE_VERSION:-4.4.3}
 
 COPY ./requirements.txt /usr/src/more_requirements.txt
 RUN yes w | pip install --src /usr/src -r /usr/src/more_requirements.txt
