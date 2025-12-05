@@ -75,7 +75,7 @@ services:
     env_file: ./.env
     environment:
       - HTTPS_HOST=${SITE_HOST_NAME}
-      # emtpy HTTP_x to only allow HTTPS connections
+      # empty HTTP_x to only allow HTTPS connections
       #- HTTP_HOST=${GEONODE_LB_HOST_IP}
       - LETSENCRYPT_MODE=disabled
       - RESOLVER=127.0.0.11
@@ -84,7 +84,7 @@ services:
       - "443:443"
     volumes:
       - statics:/mnt/volumes/statics
-        # files are expected to exist within the context 
+        # files are expected to exist within the context
       - ${CERT_PATH_CHAIN:-./docker/nginx/cert.pem}:/geonode-certificates/autoissued/fullchain.pem
       - ${CERT_PATH_KEY:-./docker/nginx/key.pem}:/geonode-certificates/autoissued/privkey.pem
     restart: always
