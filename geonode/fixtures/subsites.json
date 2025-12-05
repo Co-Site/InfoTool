@@ -64,5 +64,51 @@
     "blank_target": false,
     "url": "/leverkusen"
   }
+},
+{
+  "model": "subsites.subsite",
+  "pk": 2,
+  "fields": {
+    "slug": "red",
+    "theme": 3,
+    "can_add_resource": false,
+    "logo": "",
+    "description": "",
+    "types": "[]",
+    "allowed_permissions": "[\"view\", \"download\"]",
+    "region": [],
+    "category": [],
+    "keyword": [],
+    "groups": []
+  }
+},
+{
+  "model": "geonode_themes.geonodethemecustomization",
+  "pk": 3,
+  "fields": {
+    "date": "2025-04-10T14:42:12.427Z",
+    "name": "red",
+    "description": "",
+    "is_enabled": false,
+    "logo": "/subsites/red/geonode_red.png",
+    "extra_css": ".msgapi .gn-theme {\r\n --gn-jumbotron-bg: #ff0000;\r\n --gn-primary: #ff6666;\r\n --gn-main-color: #ff0000;\r\n --gn-button-primary-color: #333;\r\n--gn-button-primary-bg: #ff4444;\r\n}",
+    "jumbotron_bg": "",
+    "jumbotron_welcome_hide": false,
+    "welcome_theme": "JUMBOTRON_BG",
+    "jumbotron_welcome_title": "Red GeoNode",
+    "jumbotron_welcome_content": "",
+    "jumbotron_slide_show": []
+  }
+},
+{
+  "model": "base.menuitem",
+  "pk": 3,
+  "fields": {
+    "title": "red",
+    "menu": 1,
+    "order": 3,
+    "blank_target": false,
+    "url": "/red"
+  }
 }
 ]
