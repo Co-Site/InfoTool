@@ -25,6 +25,8 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = None if DEBUG else "same-origin"
 CSRF_TRUSTED_ORIGINS = (
     [
         "http://localhost",
+        "http://localhost:8081",
+        "http://localhost:8001",
     ]
     if DEBUG
     else ast.literal_eval(os.getenv("CSRF_TRUSTED_ORIGINS", "[]"))
@@ -32,6 +34,8 @@ CSRF_TRUSTED_ORIGINS = (
 CORS_ALLOWED_ORIGINS = (
     [
         "http://localhost",
+        "http://localhost:8081",
+        "http://localhost:8001",
     ]
     if DEBUG
     else ast.literal_eval(os.getenv("CORS_ALLOWED_ORIGINS", "[]"))
