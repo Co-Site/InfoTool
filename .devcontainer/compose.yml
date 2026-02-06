@@ -17,6 +17,9 @@ services:
     restart: "no"
     depends_on:
       - django
+    volumes:
+      - ./.devcontainer/_gitignore:/usr/src/geonode/.gitignore
+      - ./.devcontainer/_vscode:/usr/src/geonode/.vscode
     # volumes:
     #   - './src:/usr/src/geonode'
 
