@@ -2,3 +2,7 @@
     path = geonode/apps/externalapplications
     url = https://github.com/GeoNodeUserGroup-DE/contrib_externalapplications.git
     branch = main
+[submodule "geonode/apps/geonode-sta"]
+	path = geonode/apps/geonode_sta
+	url = git@github.com:Co-Site/geonode-sta.git
+	branch = main

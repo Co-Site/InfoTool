@@ -16,6 +16,7 @@ from geonode.settings import (  # noqa
     TEMPLATES,
     INSTALLED_APPS,
 )
+from geonode.services.enumerations import HARVESTER_TYPES
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None if DEBUG else "same-origin"
@@ -135,18 +136,37 @@ LOGGING = {
             "handlers": ["console"],
             "level": "INFO",
         },
+        "geonode_sta": {
+            "level": "DEBUG",
+        }
     },
 }
 
-
 INSTALLED_APPS += (
+    "geonode_sta",
     "externalapplications",
     "customizations",
     "subsites",
-)
+ )
 
 # SUBSITE SPECIFIC CONFIGURATION
 ENABLE_SUBSITE_CUSTOM_THEMES = True
 ENABLE_CATALOG_HOME_REDIRECTS_TO = False
 SUBSITE_READ_ONLY = False # return download_resourcebase and view resourcebase as permissions
 SUBSITE_HIDE_EXCLUSIVE_FROM_SPECIFIC_API = True # If TRUE will hide the `subsite_exclusive` resources also from the detailed endpoint `/documents`, `/maps`, `/datasets`, '/geoapps`
+
+#
+#   STA specific settings
+#
+harvester_class = 'geonode_sta.harvester.Worker'
+HARVESTER_CLASSES = [harvester_class]
+HARVESTER_TYPES["STA"] = harvester_class
+
+if 'SERVICES_TYPE_MODULES' not in locals():
+    SERVICES_TYPE_MODULES = []
+
+if 'geonode_sta.service.Registry' not in SERVICES_TYPE_MODULES:
+    SERVICES_TYPE_MODULES.append('geonode_sta.service.Registry')
+
+
+ROOT_URLCONF = 'geonode_sta.urls'

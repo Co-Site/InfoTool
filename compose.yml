@@ -22,6 +22,7 @@ x-common-django:
     # contrib apps
     - ./geonode/apps/customizations:/usr/src/geonode/customizations
     - ./geonode/apps/externalapplications/externalapplications:/usr/src/geonode/externalapplications
+    - ./geonode/apps/geonode_sta/geonode_sta:/usr/src/geonode/geonode_sta
     # volumes
     - statics:/mnt/volumes/statics
     - geoserver-data-dir:/geoserver_data/data
