@@ -1,5 +1,7 @@
 services:
   django:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .devcontainer/.env.local
     restart: "no"
@@ -12,6 +14,8 @@ services:
     command: sleep infinity
 
   celery:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .devcontainer/.env.local
     restart: "no"
@@ -24,12 +28,16 @@ services:
     #   - './src:/usr/src/geonode'
 
   geonode:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .devcontainer/.env.local
     environment:
       - HTTPS_HOST=
 
   geoserver:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .devcontainer/.env.local
     build:
@@ -44,6 +52,8 @@ services:
       - "8080:8080"
 
   db:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build:
       context: ./.devcontainer/docker/postgresql
       dockerfile: Dockerfile
@@ -53,6 +63,8 @@ services:
      - "5432:5432"
 
   mail:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     image: marcopas/docker-mailslurper:latest
     container_name: mail4${COMPOSE_PROJECT_NAME}
     volumes:
