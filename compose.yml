@@ -60,6 +60,7 @@ services:
       - django
     environment:
       - DJANGO_SETTINGS_MODULE=geonode.settings_override
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
       - IS_CELERY=True
     entrypoint: ["/usr/src/geonode/entrypoint.sh"]
     command: "celery-cmd"
