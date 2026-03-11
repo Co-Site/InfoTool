@@ -67,6 +67,7 @@ services:
 
   # Nginx is serving django static and media files and proxies to django and geonode
   geonode:
+    image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_nginx:${GEONODE_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
     build:
       context: ./docker/nginx
       dockerfile: Dockerfile
@@ -92,6 +93,7 @@ services:
 
   # Geoserver backend
   geoserver:
+    image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_geoserver:${GEONODE_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
     build:
       context: ./docker/geoserver
       dockerfile: Dockerfile
@@ -119,6 +121,7 @@ services:
         condition: service_healthy
 
   data-dir-conf:
+    image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_gsconf:${GEONODE_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
     build:
       context: ./docker/geoserver_data
       dockerfile: Dockerfile
@@ -134,6 +137,7 @@ services:
 
   # PostGIS database.
   db:
+    image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_db:${GEONODE_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
     build:
       context: ./docker/postgresql
       dockerfile: Dockerfile
