@@ -1,5 +1,10 @@
 services:
   django:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.geonode-app.entrypoints=web"
+      - "traefik.http.services.geonode-service.loadbalancer.server.port=8001"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
