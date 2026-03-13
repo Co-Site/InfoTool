@@ -107,6 +107,12 @@ services:
       - IS_CELERY=False
     entrypoint: ["/usr/src/geonode/entrypoint.sh"]
     command: "uwsgi --ini /usr/src/geonode/uwsgi.ini"
+    healthcheck:
+      test: "curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8000/"
+      start_period: 60s
+      interval: 60s
+      timeout: 10s
+      retries: 10
 
   # Celery worker that executes celery tasks created by Django.
   celery:
@@ -120,6 +126,12 @@ services:
       - IS_CELERY=True
     entrypoint: ["/usr/src/geonode/entrypoint.sh"]
     command: "celery-cmd"
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A geonode.celery_app status || exit 1"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
 
   # Geoserver backend
   geoserver:
@@ -131,12 +143,6 @@ services:
         - BASE_IMAGE_VERSION=${GEOSERVER_BASE_IMAGE_VERSION}
     container_name: geoserver4${COMPOSE_PROJECT_NAME}
     env_file: ./.env
-    healthcheck:
-      test: "curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8080/geoserver/ows"
-      start_period: 60s
-      interval: 60s
-      timeout: 10s
-      retries: 10
     volumes:
       - statics:/mnt/volumes/statics
       - geoserver-data-dir:/geoserver_data/data
@@ -149,6 +155,13 @@ services:
         condition: service_healthy
       data-dir-conf:
         condition: service_healthy
+    init: true
+    healthcheck:
+      test: "curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8080/geoserver/ows"
+      start_period: 60s
+      interval: 60s
+      timeout: 10s
+      retries: 10
 
   data-dir-conf:
     image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_gsconf:${GEOSERVER_DATA_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
@@ -181,7 +194,11 @@ services:
       - dbbackups:/pg_backups
     restart: unless-stopped
     healthcheck:
-      test: "pg_isready -d postgres -U postgres"
+      test: ["CMD-SHELL", "pg_isready -q -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Vanilla RabbitMQ service. This is needed by celery
   rabbitmq:
@@ -190,3 +207,9 @@ services:
     volumes:
       - rabbitmq:/var/lib/rabbitmq
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
