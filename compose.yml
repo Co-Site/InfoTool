@@ -11,6 +11,8 @@ x-common-django:
     args:
       - BASE_IMAGE_VERSION=${GEONODE_BASE_IMAGE_VERSION}
   restart: always
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
   env_file:
     - .env
   volumes:
@@ -76,14 +78,15 @@ services:
     container_name: nginx4${COMPOSE_PROJECT_NAME}
     env_file: ./.env
     environment:
-      - HTTPS_HOST=${SITE_HOST_NAME}
+      #- HTTPS_HOST=${SITE_HOST_NAME}
       # empty HTTP_x to only allow HTTPS connections
       #- HTTP_HOST=${GEONODE_LB_HOST_IP}
+      - HTTP_HOST=localhost
       - LETSENCRYPT_MODE=disabled
       - RESOLVER=127.0.0.11
     ports:
       - "80:80"
-      - "443:443"
+      #- "443:443"
     volumes:
       - statics:/mnt/volumes/statics
         # files are expected to exist within the context
