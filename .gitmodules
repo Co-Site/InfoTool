@@ -6,3 +6,7 @@
 	path = geonode/apps/geonode_sta
 	url = git@github.com:Co-Site/geonode-sta.git
 	branch = main
+[submodule "docker/geonode/opt-sta-client"]
+	path = docker/geonode/opt-sta-client
+	url = git@github.com:Co-Site/gn-opt-sta-client.git
+	branch = main
