@@ -10,3 +10,7 @@
 	path = docker/geonode/opt-sta-client
 	url = git@github.com:Co-Site/gn-opt-sta-client.git
 	branch = main
+[submodule "docker/geonode/gn-mapstore-client"]
+	path = docker/geonode/gn-mapstore-client
+	url = git@github.com:Co-Site/gn-mapstore-client.git
+	branch = main
