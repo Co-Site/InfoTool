@@ -47,7 +47,7 @@ location /nginx-health {
 }
 
 # GeoServer
-location /geoserver {
+location /geoportal/geoserver {
   # Using a variable is a trick to let Nginx start even if upstream host is not up yet
   # (see https://sandro-keil.de/blog/2017/07/24/let-nginx-start-if-upstream-host-is-unavailable-or-down/)
   set $upstream $GEOSERVER_LB_HOST_IP:$GEOSERVER_LB_PORT;
@@ -68,7 +68,7 @@ location /geoserver {
 }
 
 # GeoNode
-location /static/ {
+location /geoportal/static/ {
   alias /mnt/volumes/statics/static/;
 
   location ~* \.(?:html|js|jpg|jpeg|gif|png|css|tgz|gz|rar|bz2|doc|pdf|ppt|tar|wav|bmp|ttf|rtf|swf|ico|flv|txt|woff|woff2|svg|xml)$ {
@@ -80,7 +80,7 @@ location /static/ {
   }
 }
 
-location /uploaded/ {
+location /geoportal/uploaded/ {
   alias /mnt/volumes/statics/uploaded/;
 
   location ~* \.(?:html|js|jpg|jpeg|gif|png|css|tgz|gz|rar|bz2|doc|pdf|ppt|tar|wav|bmp|ttf|rtf|swf|ico|flv|txt|woff|woff2|svg|xml)$ {
@@ -92,7 +92,7 @@ location /uploaded/ {
   }
 }
 
-location / {
+location /geoportal/ {
   # Using a variable is a trick to let Nginx start even if upstream host is not up yet
   # (see https://sandro-keil.de/blog/2017/07/24/let-nginx-start-if-upstream-host-is-unavailable-or-down/)
   set $upstream $GEONODE_LB_HOST_IP:$GEONODE_LB_PORT;
@@ -110,7 +110,7 @@ location / {
   add_header Access-Control-Allow-Credentials false;
   add_header Access-Control-Allow-Headers "Content-Type, Accept, Authorization, Origin, User-Agent";
   add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";
-  
+
   proxy_redirect              off;
   proxy_set_header            Host $http_host;
   proxy_set_header            Origin $http_origin;

@@ -17,3 +17,7 @@ volumes:
     name: ${COMPOSE_PROJECT_NAME}-rabbitmq
   app-proxy:
     name: ${COMPOSE_PROJECT_NAME}-app-proxy
+  cms:
+    name: ${COMPOSE_PROJECT_NAME}-cms
+  cms-db:
+    name: ${COMPOSE_PROJECT_NAME}-cms-db
