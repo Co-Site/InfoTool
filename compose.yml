@@ -53,6 +53,8 @@ services:
       - "--api.dashboard=true"
       - "--api.insecure=true"
       - "--ping=true"
+      - "--accesslog=true"
+      - "--accesslog.bufferingsize=0"
     ports:
       - 80:80
       - 127.0.0.1:8100:8080
