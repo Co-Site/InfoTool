@@ -1,2 +1,2 @@
-ARG BASE_IMAGE_VERSION
-FROM geonode/postgis:${BASE_IMAGE_VERSION:-15.3-latest}
+ARG BASE_IMAGE_VERSION=15.3-latest
+FROM geonode/postgis:${BASE_IMAGE_VERSION}
