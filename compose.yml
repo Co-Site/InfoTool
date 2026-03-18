@@ -53,6 +53,7 @@ services:
       - "--api.dashboard=true"
       - "--api.insecure=true"
       - "--ping=true"
+      - "--log.level=DEBUG"
       - "--accesslog=true"
       - "--accesslog.bufferingsize=0"
     ports:
