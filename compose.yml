@@ -128,6 +128,11 @@ services:
       # TODO: add subsite redirects
       - "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/geoportal/`)"
       - "traefik.http.routers.geonode-app.entrypoints=web"
+      - "traefik.http.routers.geonode-app.middlewares=gn-add-slash,gn-strip"
+      - "traefik.http.middlewares.gn-add-slash.redirectregex.regex=^(https?://[^/]+)/geoportal$$"
+      - "traefik.http.middlewares.gn-add-slash.redirectregex.replacement=$${1}/geoportal/"
+      - "traefik.http.middlewares.gn-add-slash.redirectregex.permanent=true"
+      - "traefik.http.middlewares.gn-strip.stripprefix.prefixes=/geoportal/"
       - "traefik.http.services.geonode-service.loadbalancer.server.port=80"
     image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_nginx:${NGINX_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
     build:
