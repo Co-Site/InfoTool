@@ -91,6 +91,10 @@ services:
       - "traefik.http.middlewares.cms-add-slash.redirectregex.regex=^(https?://[^/]+)/infotool$$"
       - "traefik.http.middlewares.cms-add-slash.redirectregex.replacement=$${1}/infotool/"
       - "traefik.http.middlewares.cms-add-slash.redirectregex.permanent=true"
+      # TODO: active next three lines, if new context path is working/to be tested
+      #- "traefik.http.routers.cms-router.middlewares=root-redirect"
+      #- "traefik.http.middlewares.root-redirect.redirectregex.regex=^https?://([^/]+)/$$"
+      #- "traefik.http.middlewares.root-redirect.redirectregex.replacement=https://$${1}/infotool/"
       - "traefik.http.services.cms-service.loadbalancer.server.port=80"
     depends_on:
       cms-db:
