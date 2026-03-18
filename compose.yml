@@ -100,6 +100,18 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+  cms-cli:
+    # source: https://hub.docker.com/_/wordpress#wordpresscli
+    image: wordpress:${WORDPRESS_CLI_IMAGE_VERSION}
+    user: "33:33"
+    volumes:
+      - cms:/var/www/html
+    env_file:
+      - .env.cms
+    depends_on:
+      - cms-db
+    profiles:
+      - tools
   cms-db:
     image: mariadb:11.4.10
     container_name: cms-db4${COMPOSE_PROJECT_NAME}
