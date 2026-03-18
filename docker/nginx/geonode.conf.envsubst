@@ -39,6 +39,13 @@ gzip_types
         application/x-javascript
         application/json;
 
+# Infrastructure
+location /nginx-health {
+  access_log off;
+  log_not_found off;
+  return 200 "healthy\n";
+}
+
 # GeoServer
 location /geoserver {
   # Using a variable is a trick to let Nginx start even if upstream host is not up yet

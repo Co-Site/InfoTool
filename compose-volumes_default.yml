@@ -15,3 +15,5 @@ volumes:
     name: ${COMPOSE_PROJECT_NAME}-tmp
   rabbitmq:
     name: ${COMPOSE_PROJECT_NAME}-rabbitmq
+  app-proxy:
+    name: ${COMPOSE_PROJECT_NAME}-app-proxy

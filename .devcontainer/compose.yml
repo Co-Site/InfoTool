@@ -1,32 +1,49 @@
 services:
   django:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.geonode-app.entrypoints=web"
+      - "traefik.http.services.geonode-service.loadbalancer.server.port=8001"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .devcontainer/.env.local
     restart: "no"
     volumes:
       - ./.devcontainer/_gitignore:/usr/src/geonode/.gitignore
       - ./.devcontainer/_vscode:/usr/src/geonode/.vscode
+      - ./.devcontainer:/usr/src/geonode/.devcontainer
     ports:
       - "8001:8001"
     #command: /usr/src/geonode/custom_entrypoint.sh
     command: sleep infinity
 
   celery:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .devcontainer/.env.local
     restart: "no"
     depends_on:
       - django
+    volumes:
+      - ./.devcontainer/_gitignore:/usr/src/geonode/.gitignore
+      - ./.devcontainer/_vscode:/usr/src/geonode/.vscode
     # volumes:
     #   - './src:/usr/src/geonode'
 
   geonode:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .devcontainer/.env.local
     environment:
       - HTTPS_HOST=
 
   geoserver:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .devcontainer/.env.local
     build:
@@ -41,6 +58,8 @@ services:
       - "8080:8080"
 
   db:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build:
       context: ./.devcontainer/docker/postgresql
       dockerfile: Dockerfile
@@ -50,6 +69,8 @@ services:
      - "5432:5432"
 
   mail:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     image: marcopas/docker-mailslurper:latest
     container_name: mail4${COMPOSE_PROJECT_NAME}
     volumes:

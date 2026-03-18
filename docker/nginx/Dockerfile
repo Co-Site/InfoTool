@@ -1,5 +1,5 @@
 ARG BASE_IMAGE_VERSION
-FROM geonode/nginx:${BASE_IMAGE_VERSION:-4.4.3}
+FROM geonode/nginx:${BASE_IMAGE_VERSION:-1.25.3-latest}
 
 ENV STATIC_ROOT=/mnt/volumes/statics/static/
 ENV MEDIA_ROOT=/mnt/volumes/statics/uploaded/
