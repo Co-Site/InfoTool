@@ -89,7 +89,7 @@ LOGGING = {
     "filters": {"require_debug_false": {"()": "django.utils.log.RequireDebugFalse"}},  # noqa
     "handlers": {
         "console": {
-            "level": "WARNING",
+            #"level": "WARNING", # no global level
             "class": "logging.StreamHandler",
             "stream": sys.stdout,
             "formatter": "simple",
@@ -106,35 +106,27 @@ LOGGING = {
             "level": "WARNING",
         },
         "django": {
-            "handlers": ["console"],
             "level": "INFO",
         },
         "geonode": {
-            "handlers": ["console"],
             "level": "INFO",
         },
         "geoserver-restconfig.catalog": {
-            "handlers": ["console"],
             "level": "ERROR",
         },
         "owslib": {
-            "handlers": ["console"],
             "level": "ERROR",
         },
         "pycsw": {
-            "handlers": ["console"],
             "level": "ERROR",
         },
         "celery": {
-            "handlers": ["console"],
             "level": "INFO",
         },
         "mapstore2_adapter.plugins.serializers": {
-            "handlers": ["console"],
             "level": "INFO",
         },
         "geonode_logstash.logstash": {
-            "handlers": ["console"],
             "level": "INFO",
         },
         "geonode_sta": {
