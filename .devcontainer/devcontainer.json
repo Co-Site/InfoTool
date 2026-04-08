@@ -62,7 +62,7 @@
 	"postCreateCommand": [
 		"bash",
 		"-c",
-		"/usr/src/geonode/entrypoint.sh && python manage.py dbshell -- -c \"UPDATE public.base_hierarchicalkeyword SET path = '0001' WHERE slug = 'subsite_exclusive'\""
+		"/usr/src/geonode/entrypoint.sh && python manage.py dbshell -- -c \"UPDATE public.base_hierarchicalkeyword SET path = '0001' WHERE slug = 'subsite_exclusive' AND (path IS NULL OR path = '')\""
 	]
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode"
