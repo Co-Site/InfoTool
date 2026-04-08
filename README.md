@@ -149,3 +149,19 @@ Check the service status:
 ```sh
 systemctl status geonode.service
 ```
+
+## Known Issues
+
+### Hierarchical Keywords Initially Not Working
+
+The subsites extension has an documented not fixed issue: "[Exclusive keyword causing problems because of missing path](https://github.com/geosolutions-it/geonode-subsites/issues/46)".
+
+As a workaround, a post create command is added to the [devcontainer.json](.devcontainer/devcontainer.json):
+
+```json
+"postCreateCommand": [
+  "bash",
+  "-c",
+  "python manage.py dbshell -- -c \"UPDATE public.base_hierarchicalkeyword SET path = '0001' WHERE slug = 'subsite_exclusive'\""
+]
+```
