@@ -59,7 +59,7 @@
 
 	// Uncomment the next line to run commands after the container is created - for example installing curl.
 	// "postCreateCommand": "apt-get update && apt-get install -y curl",
-	"postCreateCommand": [
+	"postStartCommand": [
 		"bash",
 		"-c",
 		"/usr/src/geonode/entrypoint.sh && python manage.py dbshell -- -c \"UPDATE public.base_hierarchicalkeyword SET path = '0001' WHERE slug = 'subsite_exclusive' AND (path IS NULL OR path = '')\""
