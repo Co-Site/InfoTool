@@ -1,7 +1,7 @@
 [submodule "geonode/externalapplications"]
-    path = geonode/apps/externalapplications
-    url = https://github.com/GeoNodeUserGroup-DE/contrib_externalapplications.git
-    branch = main
+	path = geonode/apps/externalapplications
+	url = git@github.com:52North/contrib_externalapplications.git
+	branch = main
 [submodule "geonode/apps/geonode-sta"]
 	path = geonode/apps/geonode_sta
 	url = git@github.com:Co-Site/geonode-sta.git
