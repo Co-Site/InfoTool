@@ -166,5 +166,8 @@ if 'geonode_sta.service.Registry' not in SERVICES_TYPE_MODULES:
 
 ROOT_URLCONF = 'geonode_sta.urls'
 
+#
+#   Fix SSL behind app-proxy
+#
 if SITEURL.startswith("https"):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
