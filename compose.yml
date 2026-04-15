@@ -65,8 +65,16 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+
   # Nginx is serving django static and media files and proxies to django and geonode
   geonode:
+    image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_nginx:${NGINX_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+      args:
+        - BASE_IMAGE_VERSION=${NGINX_BASE_IMAGE_VERSION}
+    container_name: nginx4${COMPOSE_PROJECT_NAME}
     labels:
       - "traefik.enable=true"
       # TODO: switch, if new context path is working/to be tested
@@ -77,13 +85,6 @@ services:
       - "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/`)"
       - "traefik.http.routers.geonode-app.entrypoints=web"
       - "traefik.http.services.geonode-service.loadbalancer.server.port=80"
-    image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_nginx:${NGINX_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
-    build:
-      context: ./docker/nginx
-      dockerfile: Dockerfile
-      args:
-        - BASE_IMAGE_VERSION=${NGINX_BASE_IMAGE_VERSION}
-    container_name: nginx4${COMPOSE_PROJECT_NAME}
     env_file: .env
     environment:
       - HTTP_HOST=localhost
@@ -98,6 +99,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
   # Our custom django application. It includes Geonode.
   django:
     << : *default-common-django
