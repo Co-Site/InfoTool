@@ -13,8 +13,9 @@ import sys
 from geonode.settings import *  # noqa
 from geonode.settings import (  # noqa
     DEBUG,
-    TEMPLATES,
     INSTALLED_APPS,
+    SITEURL,
+    TEMPLATES,
 )
 from geonode.services.enumerations import HARVESTER_TYPES
 
@@ -139,13 +140,15 @@ INSTALLED_APPS += (
     "externalapplications",
     "customizations",
     "subsites",
- )
+)
 
 # SUBSITE SPECIFIC CONFIGURATION
 ENABLE_SUBSITE_CUSTOM_THEMES = True
 ENABLE_CATALOG_HOME_REDIRECTS_TO = False
-SUBSITE_READ_ONLY = False # return download_resourcebase and view resourcebase as permissions
-SUBSITE_HIDE_EXCLUSIVE_FROM_SPECIFIC_API = True # If TRUE will hide the `subsite_exclusive` resources also from the detailed endpoint `/documents`, `/maps`, `/datasets`, '/geoapps`
+# return download_resourcebase and view resourcebase as permissions
+SUBSITE_READ_ONLY = False
+# If TRUE will hide the `subsite_exclusive` resources also from the detailed endpoint `/documents`, `/maps`, `/datasets`, '/geoapps`
+SUBSITE_HIDE_EXCLUSIVE_FROM_SPECIFIC_API = True
 
 #
 #   STA specific settings
@@ -162,3 +165,6 @@ if 'geonode_sta.service.Registry' not in SERVICES_TYPE_MODULES:
 
 
 ROOT_URLCONF = 'geonode_sta.urls'
+
+if SITEURL.startswith("https"):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

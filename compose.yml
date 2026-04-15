@@ -68,7 +68,7 @@ services:
     labels:
       - "traefik.enable=true"
       # TODO: switch, if new context path is working/to be tested
-      #- "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/geonode/`)"
+      #- "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/geoportal/`)"
       # TODO: add geoserver redirect
       # TODO: add some geonode redirects
       # TODO: add subsite redirects
