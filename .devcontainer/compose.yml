@@ -18,6 +18,12 @@ services:
       - "8001:8001"
     #command: /usr/src/geonode/custom_entrypoint.sh
     command: sleep infinity
+    healthcheck:
+      test: "exit 0"
+      start_period: 0s
+      interval: 10s
+      timeout: 5s
+      retries: 1
 
   celery:
     extra_hosts:
