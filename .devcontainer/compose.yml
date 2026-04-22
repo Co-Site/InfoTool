@@ -74,6 +74,33 @@ services:
     ports:
      - "5432:5432"
 
+  sta:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env.sta
+    #   - .devcontainer/.env.local
+    # environment:
+    #   - HTTPS_HOST=
+    ports:
+      # web
+      - 8081:8080
+      # mqtt native
+      - 8883:1883
+      # mqtt websocket
+      - 8876:9876
+
+  sta-db:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env.sta
+    #   - .devcontainer/.env.local
+    # environment:
+    #   - HTTPS_HOST=
+    ports:
+      - 5433:5432
+
   mail:
     extra_hosts:
       - "host.docker.internal:host-gateway"

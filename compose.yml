@@ -49,11 +49,18 @@ services:
       - "--providers.docker"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.mqtt.address=:1883"
+      - "--entrypoints.mqtt-websocket.address=:9876"
       - "--api.dashboard=true"
       - "--api.insecure=true"
       - "--ping=true"
     ports:
       - 80:80
+      # mqtt→native
+      - 1883:1883
+      # mqtt→websocket
+      - 9876:9876
+      # traefik→dashboard
       - 127.0.0.1:8100:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -215,4 +222,54 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  #
+  # STA
+  # → HTTP /sensordata/
+  # → MQTT → native → 8883:1883
+  #        → websocket → 443:9876 & /sensordata/mqtt
+  sta:
+    image: fraunhoferiosb/frost-server:${FROST_SERVER_IMAGE_VERSION}
+    container_name: sta4${COMPOSE_PROJECT_NAME}
+    env_file: .env.sta
+    labels:
+      - "traefik.enable=true"
+      # HTTP Router
+      - "traefik.http.routers.sta-http.rule=Host(`localhost`) && PathPrefix(`/sensordata`)"
+      - "traefik.http.routers.sta-http.entrypoints=web"
+      - "traefik.http.services.sta-http.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.sta-prefix-rewrite.replacepathregex.regex=^/sensordata/(.*)"
+      - "traefik.http.middlewares.sta-prefix-rewrite.replacepathregex.replacement=/FROST-Server/$$1"
+      # TODO: add middleware to forward /sensordata(/?) → /sensordata/v1.1/
+      - "traefik.http.routers.sta-http.middlewares=sta-prefix-rewrite"
+      # Native MQTT (TCP)
+      - "traefik.tcp.routers.sta-mqtt-native.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.sta-mqtt-native.entrypoints=mqtt"
+      - "traefik.tcp.services.sta-mqtt-native.loadbalancer.server.port=1883"
+    depends_on:
+      sta-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/FROST-Server/"]
       start_period: 20s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  sta-db:
+    image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_sta-db:${FROST_SERVER_DB_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
+    container_name: sta-db4${COMPOSE_PROJECT_NAME}
+    build:
+      context: ./docker/sta-db
+      dockerfile: Dockerfile
+      args:
+        - BASE_IMAGE_VERSION=${FROST_SERVER_DB_BASE_IMAGE_VERSION}
+    env_file: .env.sta
+    volumes:
+      - sta-dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-postgres}"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5

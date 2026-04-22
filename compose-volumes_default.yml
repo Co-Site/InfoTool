@@ -17,3 +17,5 @@ volumes:
     name: ${COMPOSE_PROJECT_NAME}-rabbitmq
   app-proxy:
     name: ${COMPOSE_PROJECT_NAME}-app-proxy
+  sta-dbdata:
+    name: ${COMPOSE_PROJECT_NAME}-sta-dbdata
