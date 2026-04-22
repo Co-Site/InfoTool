@@ -78,13 +78,13 @@ services:
     labels:
       - "traefik.enable=true"
       # TODO: switch, if new context path is working/to be tested
-      #- "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/geoportal/`)"
+      #- "traefik.http.routers.geonode.rule=Host(`localhost`) && PathPrefix(`/geoportal/`)"
       # TODO: add geoserver redirect
       # TODO: add some geonode redirects
       # TODO: add subsite redirects
-      - "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/`)"
-      - "traefik.http.routers.geonode-app.entrypoints=web"
-      - "traefik.http.services.geonode-service.loadbalancer.server.port=80"
+      - "traefik.http.routers.geonode.rule=Host(`localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.geonode.entrypoints=web"
+      - "traefik.http.services.geonode.loadbalancer.server.port=80"
     env_file: .env
     environment:
       - HTTP_HOST=localhost
