@@ -90,6 +90,7 @@ services:
       # TODO: add subsite redirects
       - "traefik.http.routers.geonode.rule=Host(`localhost`) && PathPrefix(`/`)"
       - "traefik.http.routers.geonode.entrypoints=web"
+      - "traefik.http.routers.geonode.service=geonode"
       - "traefik.http.services.geonode.loadbalancer.server.port=80"
     env_file: .env
     environment:
@@ -240,12 +241,18 @@ services:
       - "traefik.http.services.sta-http.loadbalancer.server.port=8080"
       - "traefik.http.middlewares.sta-prefix-rewrite.replacepathregex.regex=^/sensordata/(.*)"
       - "traefik.http.middlewares.sta-prefix-rewrite.replacepathregex.replacement=/FROST-Server/$$1"
-      # TODO: add middleware to forward /sensordata(/?) → /sensordata/v1.1/
       - "traefik.http.routers.sta-http.middlewares=sta-prefix-rewrite"
+      - "traefik.http.routers.sta-http.service=sta-http"
       # Native MQTT (TCP)
       - "traefik.tcp.routers.sta-mqtt-native.rule=HostSNI(`*`)"
       - "traefik.tcp.routers.sta-mqtt-native.entrypoints=mqtt"
+      - "traefik.tcp.routers.sta-mqtt-native.service=sta-mqtt-native"
       - "traefik.tcp.services.sta-mqtt-native.loadbalancer.server.port=1883"
+      # MQTT WebSockets (HTTP)
+      - "traefik.http.routers.sta-mqtt-websocket.priority=100"
+      - "traefik.http.routers.sta-mqtt-websocket.entrypoints=mqtt-websocket"
+      - "traefik.http.routers.sta-mqtt-websocket.service=sta-mqtt-websocket"
+      - "traefik.http.services.sta-mqtt-websocket.loadbalancer.server.port=9876"
     depends_on:
       sta-db:
         condition: service_healthy
