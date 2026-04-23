@@ -13,19 +13,19 @@ done
 echo "[WRAPPER] ---"
 echo "[WRAPPER] PostgreSQL is up. Starting user synchronization..."
 echo "[WRAPPER] ---"
-# Remove all users before adding only the configured
+# 0. Remove all users before adding only the configured
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOF
     DELETE FROM public."USERS" CASCADE;
 EOF
 echo "$FROST_USERS" | jq -c '.[]' | while read -r row; do
     USER_NAME=$(echo "$row" | jq -r '.name')
     USER_PASSWORD=$(echo "$row" | jq -r '.password')
+    # 1. Insert User
     psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOF
         INSERT INTO public."USERS" ("USER_NAME", "USER_PASS")
-        VALUES ('$USER_NAME', crypt('$USER_PASSWORD', gen_salt('bf')))
-        ON CONFLICT ("USER_NAME")
-        DO UPDATE SET "USER_PASS" = EXCLUDED."USER_PASS";
+        VALUES ('$USER_NAME', crypt('$USER_PASSWORD', gen_salt('bf')));
 EOF
+    # 2. Insert Roles
     echo "$row" | jq -r '.roles[]' | while read -r USER_ROLE; do
         psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOF
             INSERT INTO public."USER_ROLES" ("USER_NAME", "ROLE_NAME")
