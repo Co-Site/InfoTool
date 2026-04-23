@@ -252,6 +252,7 @@ services:
       - "traefik.http.routers.sta-mqtt-websocket.priority=100"
       - "traefik.http.routers.sta-mqtt-websocket.entrypoints=mqtt-websocket"
       - "traefik.http.routers.sta-mqtt-websocket.service=sta-mqtt-websocket"
+      - "traefik.http.routers.sta-mqtt-websocket.middlewares=sta-prefix-rewrite"
       - "traefik.http.services.sta-mqtt-websocket.loadbalancer.server.port=9876"
     depends_on:
       sta-db:
