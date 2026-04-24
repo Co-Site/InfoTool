@@ -49,7 +49,7 @@ services:
       - "--providers.docker"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.mqtt.address=:1883"
+      - "--entrypoints.mqtt-native.address=:1883"
       - "--entrypoints.mqtt-websocket.address=:9876"
       - "--api.dashboard=true"
       - "--api.insecure=true"
@@ -245,7 +245,7 @@ services:
       - "traefik.http.routers.sta-http.service=sta-http"
       # Native MQTT (TCP)
       - "traefik.tcp.routers.sta-mqtt-native.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.sta-mqtt-native.entrypoints=mqtt"
+      - "traefik.tcp.routers.sta-mqtt-native.entrypoints=mqtt-native"
       - "traefik.tcp.routers.sta-mqtt-native.service=sta-mqtt-native"
       - "traefik.tcp.services.sta-mqtt-native.loadbalancer.server.port=1883"
       # MQTT WebSockets (HTTP)
