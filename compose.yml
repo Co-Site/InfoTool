@@ -249,7 +249,6 @@ services:
       - "traefik.tcp.routers.sta-mqtt-native.service=sta-mqtt-native"
       - "traefik.tcp.services.sta-mqtt-native.loadbalancer.server.port=1883"
       # MQTT WebSockets (HTTP)
-      - "traefik.http.routers.sta-mqtt-websocket.priority=100"
       - "traefik.http.routers.sta-mqtt-websocket.entrypoints=mqtt-websocket"
       - "traefik.http.routers.sta-mqtt-websocket.service=sta-mqtt-websocket"
       - "traefik.http.routers.sta-mqtt-websocket.middlewares=sta-prefix-rewrite"
