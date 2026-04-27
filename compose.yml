@@ -13,8 +13,7 @@ x-common-django:
   restart: always
   extra_hosts:
     - "host.docker.internal:host-gateway"
-  env_file:
-    - .env
+  env_file: .env
   volumes:
     # configuration
     - ./geonode/geonode/settings_override.py:/usr/src/geonode/geonode/settings_override.py
@@ -50,21 +49,57 @@ services:
       - "--providers.docker"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entryPoints.web.http.encodedCharacters.allowEncodedBackSlash=false"
+      - "--entryPoints.web.http.encodedCharacters.allowEncodedHash=false"
+      - "--entryPoints.web.http.encodedCharacters.allowEncodedNullCharacter=false"
+      - "--entryPoints.web.http.encodedCharacters.allowEncodedPercent=false"
+      - "--entryPoints.web.http.encodedCharacters.allowEncodedQuestionMark=false"
+      - "--entryPoints.web.http.encodedCharacters.allowEncodedSemicolon=false"
+      - "--entryPoints.web.http.encodedCharacters.allowEncodedSlash=false"
+      - "--entryPoints.web.http.sanitizePath=true"
+      - "--entrypoints.mqtt-native.address=:1883"
+      - "--entrypoints.mqtt-websocket.address=:9876"
+      - "--entryPoints.mqtt-websocket.http.encodedCharacters.allowEncodedBackSlash=false"
+      - "--entryPoints.mqtt-websocket.http.encodedCharacters.allowEncodedHash=false"
+      - "--entryPoints.mqtt-websocket.http.encodedCharacters.allowEncodedNullCharacter=false"
+      - "--entryPoints.mqtt-websocket.http.encodedCharacters.allowEncodedPercent=false"
+      - "--entryPoints.mqtt-websocket.http.encodedCharacters.allowEncodedQuestionMark=false"
+      - "--entryPoints.mqtt-websocket.http.encodedCharacters.allowEncodedSemicolon=false"
+      - "--entryPoints.mqtt-websocket.http.encodedCharacters.allowEncodedSlash=false"
+      - "--entryPoints.mqtt-websocket.http.sanitizePath=true"
       - "--api.dashboard=true"
       - "--api.insecure=true"
       - "--ping=true"
+      # DEBUG, INFO, WARN, ERROR
+      - "--log.level=DEBUG"
+      - "--accesslog=true"
+      # NOT IN PRODUCTION
+      # NOT IN PRODUCTION
+      # NOT IN PRODUCTION
+      - "--accesslog.fields.names.ClientUsername=keep"
+    labels:
+    #
+    # Shared traefik middlewares
+    #
+    - "traefik.http.middlewares.n52-ipallowlist.ipallowlist.sourcerange=127.0.0.1/32,80.156.182.234/32"
+    - "traefik.tcp.middlewares.n52-ipallowlist.ipallowlist.sourcerange=127.0.0.1/32,80.156.182.234/32"
     ports:
       - 80:80
+      # mqtt→native
+      - 1883:1883
+      # mqtt→websocket
+      - 9876:9876
+      # traefik→dashboard
       - 127.0.0.1:8100:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - app-proxy:/letsencrypt
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/ping"]
+      start_period: 15s
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 15s
 
   # Nginx is serving django static and media files and proxies to django and geonode
   geonode:
@@ -78,13 +113,14 @@ services:
     labels:
       - "traefik.enable=true"
       # TODO: switch, if new context path is working/to be tested
-      #- "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/geoportal/`)"
+      #- "traefik.http.routers.geonode.rule=Host(`localhost`) && PathPrefix(`/geoportal/`)"
       # TODO: add geoserver redirect
       # TODO: add some geonode redirects
       # TODO: add subsite redirects
-      - "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/`)"
-      - "traefik.http.routers.geonode-app.entrypoints=web"
-      - "traefik.http.services.geonode-service.loadbalancer.server.port=80"
+      - "traefik.http.routers.geonode.rule=Host(`localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.geonode.entrypoints=web"
+      - "traefik.http.routers.geonode.service=geonode"
+      - "traefik.http.services.geonode.loadbalancer.server.port=80"
     env_file: .env
     environment:
       - HTTP_HOST=localhost
@@ -96,6 +132,7 @@ services:
     healthcheck:
       test: >
         curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:80/nginx-health
+      start_period: 30s
       interval: 30s
       timeout: 10s
       retries: 3
@@ -114,7 +151,7 @@ services:
       start_period: 60s
       interval: 60s
       timeout: 10s
-      retries: 10
+      retries: 5
 
   # Celery worker that executes celery tasks created by Django.
   celery:
@@ -130,10 +167,10 @@ services:
     command: "celery-cmd"
     healthcheck:
       test: ["CMD-SHELL", "celery -A geonode.celery_app status || exit 1"]
-      interval: 30s
+      start_period: 60s
+      interval: 60s
       timeout: 15s
       retries: 5
-      start_period: 60s
 
   # Geoserver backend
   geoserver:
@@ -144,7 +181,7 @@ services:
       args:
         - BASE_IMAGE_VERSION=${GEOSERVER_BASE_IMAGE_VERSION}
     container_name: geoserver4${COMPOSE_PROJECT_NAME}
-    env_file: ./.env
+    env_file: .env
     volumes:
       - statics:/mnt/volumes/statics
       - geoserver-data-dir:/geoserver_data/data
@@ -163,7 +200,7 @@ services:
       start_period: 60s
       interval: 60s
       timeout: 10s
-      retries: 10
+      retries: 5
 
   data-dir-conf:
     image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_gsconf:${GEOSERVER_DATA_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
@@ -190,17 +227,17 @@ services:
         - BASE_IMAGE_VERSION=${POSTGRES_BASE_IMAGE_VERSION}
     command: postgres -c "max_connections=${POSTGRES_MAX_CONNECTIONS}"
     container_name: db4${COMPOSE_PROJECT_NAME}
-    env_file: ./.env
+    env_file: .env
     volumes:
       - dbdata:/var/lib/postgresql/data
       - dbbackups:/pg_backups
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -q -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-postgres}"]
+      start_period: 30s
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
 
   # Vanilla RabbitMQ service. This is needed by celery
   rabbitmq:
@@ -211,7 +248,72 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      start_period: 20s
       interval: 30s
       timeout: 10s
       retries: 3
+
+  #
+  # STA
+  # → HTTP /sensordata/
+  # → MQTT → native → 8883:1883
+  #        → websocket → 443:9876 & /sensordata/mqtt
+  sta:
+    image: fraunhoferiosb/frost-server:${FROST_SERVER_IMAGE_VERSION}
+    container_name: sta4${COMPOSE_PROJECT_NAME}
+    env_file: .env.sta
+    labels:
+      - "traefik.enable=true"
+      #
+      # shared middlewares
+      #
+      # ip based strategy is default, hence no strategy specified
+      - "traefik.http.middlewares.sta-ratelimit.ratelimit.average=10"
+      - "traefik.http.middlewares.sta-ratelimit.ratelimit.burst=20"
+      - "traefik.http.middlewares.sta-ratelimit.ratelimit.period=1s"
+      # HTTP Router
+      - "traefik.http.routers.sta-http.rule=Host(`localhost`) && PathPrefix(`/sensordata/v1.1`)"
+      - "traefik.http.routers.sta-http.entrypoints=web"
+      - "traefik.http.services.sta-http.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.sta-contextpath-rewrite.replacepathregex.regex=^/sensordata/(.*)"
+      - "traefik.http.middlewares.sta-contextpath-rewrite.replacepathregex.replacement=/FROST-Server/$$1"
+      - "traefik.http.routers.sta-http.middlewares=n52-ipallowlist,sta-ratelimit,sta-contextpath-rewrite"
+      - "traefik.http.routers.sta-http.service=sta-http"
+      # Native MQTT (TCP)
+      - "traefik.tcp.routers.sta-mqtt-native.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.sta-mqtt-native.entrypoints=mqtt-native"
+      - "traefik.tcp.routers.sta-mqtt-native.service=sta-mqtt-native"
+      - "traefik.tcp.services.sta-mqtt-native.loadbalancer.server.port=1883"
+      - "traefik.tcp.routers.sta-mqtt-native.middlewares=n52-ipallowlist"
+      # MQTT WebSockets (HTTP)
+      - "traefik.http.routers.sta-mqtt-websocket.entrypoints=mqtt-websocket"
+      - "traefik.http.routers.sta-mqtt-websocket.service=sta-mqtt-websocket"
+      - "traefik.http.routers.sta-mqtt-websocket.middlewares=n52-ipallowlist,sta-ratelimit,sta-contextpath-rewrite"
+      - "traefik.http.services.sta-mqtt-websocket.loadbalancer.server.port=9876"
+    depends_on:
+      sta-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/FROST-Server/"]
       start_period: 20s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  sta-db:
+    image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_sta-db:${FROST_SERVER_DB_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
+    container_name: sta-db4${COMPOSE_PROJECT_NAME}
+    build:
+      context: ./docker/sta-db
+      dockerfile: Dockerfile
+      args:
+        - BASE_IMAGE_VERSION=${FROST_SERVER_DB_BASE_IMAGE_VERSION}
+    env_file: .env.sta
+    volumes:
+      - sta-dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-postgres}"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
