@@ -54,6 +54,12 @@ services:
       - "--api.dashboard=true"
       - "--api.insecure=true"
       - "--ping=true"
+    labels:
+    #
+    # Shared traefik middlewares
+    #
+    - "traefik.http.middlewares.n52-ipallowlist.ipallowlist.sourcerange=127.0.0.1/32,80.156.182.234/32"
+    - "traefik.tcp.middlewares.n52-ipallowlist.ipallowlist.sourcerange=127.0.0.1/32,80.156.182.234/32"
     ports:
       - 80:80
       # mqtt→native
