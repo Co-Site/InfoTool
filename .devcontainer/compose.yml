@@ -2,22 +2,28 @@ services:
   django:
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.geonode-app.rule=Host(`localhost`) && PathPrefix(`/`)"
-      - "traefik.http.routers.geonode-app.entrypoints=web"
-      - "traefik.http.services.geonode-service.loadbalancer.server.port=8001"
+      - "traefik.http.routers.geonode.rule=Host(`localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.geonode.entrypoints=web"
+      - "traefik.http.services.geonode.loadbalancer.server.port=8001"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
       - .devcontainer/.env.local
     restart: "no"
     volumes:
-      - ./.devcontainer/_gitignore:/usr/src/geonode/.gitignore
-      - ./.devcontainer/_vscode:/usr/src/geonode/.vscode
-      - ./.devcontainer:/usr/src/geonode/.devcontainer
+      - .devcontainer/_gitignore:/usr/src/geonode/.gitignore
+      - .devcontainer/_vscode:/usr/src/geonode/.vscode
+      - .devcontainer:/usr/src/geonode/.devcontainer
     ports:
       - "8001:8001"
     #command: /usr/src/geonode/custom_entrypoint.sh
     command: sleep infinity
+    healthcheck:
+      test: "exit 0"
+      start_period: 0s
+      interval: 10s
+      timeout: 5s
+      retries: 1
 
   celery:
     extra_hosts:
@@ -28,8 +34,8 @@ services:
     depends_on:
       - django
     volumes:
-      - ./.devcontainer/_gitignore:/usr/src/geonode/.gitignore
-      - ./.devcontainer/_vscode:/usr/src/geonode/.vscode
+      - .devcontainer/_gitignore:/usr/src/geonode/.gitignore
+      - .devcontainer/_vscode:/usr/src/geonode/.vscode
     # volumes:
     #   - './src:/usr/src/geonode'
 
@@ -47,7 +53,7 @@ services:
     env_file:
       - .devcontainer/.env.local
     build:
-      context: ./.devcontainer/docker/geoserver
+      context: .devcontainer/docker/geoserver
       dockerfile: Dockerfile
       args:
         - BASE_IMAGE_VERSION=${GEOSERVER_BASE_IMAGE_VERSION}
@@ -61,12 +67,33 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     build:
-      context: ./.devcontainer/docker/postgresql
+      context: .devcontainer/docker/postgresql
       dockerfile: Dockerfile
       args:
         - BASE_IMAGE_VERSION=${POSTGRES_BASE_IMAGE_VERSION}
     ports:
      - "5432:5432"
+
+  sta:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env.sta
+    ports:
+      # web
+      - 8081:8080
+      # mqtt native
+      - 8883:1883
+      # mqtt websocket
+      - 8876:9876
+
+  sta-db:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env.sta
+    ports:
+      - 5433:5432
 
   mail:
     extra_hosts:
@@ -74,7 +101,7 @@ services:
     image: marcopas/docker-mailslurper:latest
     container_name: mail4${COMPOSE_PROJECT_NAME}
     volumes:
-      - ./.devcontainer/docker/mail/custom-config.json:/opt/mailslurper/config.json
+      - .devcontainer/docker/mail/custom-config.json:/opt/mailslurper/config.json
     ports:
       - "8008:8080"
       - "8085:8085"

@@ -156,12 +156,12 @@ systemctl status geonode.service
 
 The subsites extension has an documented not fixed issue: "[Exclusive keyword causing problems because of missing path](https://github.com/geosolutions-it/geonode-subsites/issues/46)".
 
-As a workaround, a post create command is added to the [devcontainer.json](.devcontainer/devcontainer.json):
+As a workaround, a post start command is added to the [devcontainer.json](.devcontainer/devcontainer.json):
 
 ```json
-"postCreateCommand": [
+"postStartCommand": [
   "bash",
   "-c",
-  "python manage.py dbshell -- -c \"UPDATE public.base_hierarchicalkeyword SET path = '0001' WHERE slug = 'subsite_exclusive'\""
+  "/usr/src/geonode/entrypoint.sh && python manage.py dbshell -- -c \"UPDATE public.base_hierarchicalkeyword SET path = '0001' WHERE slug = 'subsite_exclusive' AND (path IS NULL OR path = '')\""
 ]
 ```

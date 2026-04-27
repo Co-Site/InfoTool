@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOF
+  -- Table: public.USERS
+  CREATE TABLE IF NOT EXISTS public."USERS"
+  (
+      "USER_NAME" character varying(64) NOT NULL,
+      "USER_PASS" character varying(255),
+      CONSTRAINT "USERS_PKEY" PRIMARY KEY ("USER_NAME")
+  );
+
+  ALTER TABLE public."USERS" OWNER TO $POSTGRES_USER;
+
+  -- Table: public.USER_ROLES
+  CREATE TABLE IF NOT EXISTS public."USER_ROLES"
+  (
+      "USER_NAME" character varying(64) NOT NULL,
+      "ROLE_NAME" character varying(16) NOT NULL,
+      CONSTRAINT "USER_ROLES_pkey" PRIMARY KEY ("USER_NAME", "ROLE_NAME"),
+      CONSTRAINT "USER_ROLES_USERS_FKEY" FOREIGN KEY ("USER_NAME")
+          REFERENCES public."USERS" ("USER_NAME") ON UPDATE CASCADE ON DELETE CASCADE
+  );
+
+  ALTER TABLE public."USER_ROLES" OWNER TO $POSTGRES_USER;
+
+  CREATE EXTENSION IF NOT EXISTS pgcrypto;
+EOF
