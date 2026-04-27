@@ -264,23 +264,31 @@ services:
     env_file: .env.sta
     labels:
       - "traefik.enable=true"
+      #
+      # shared middlewares
+      #
+      # ip based strategy is default, hence no strategy specified
+      - "traefik.http.middlewares.sta-ratelimit.ratelimit.average=10"
+      - "traefik.http.middlewares.sta-ratelimit.ratelimit.burst=20"
+      - "traefik.http.middlewares.sta-ratelimit.ratelimit.period=1s"
       # HTTP Router
       - "traefik.http.routers.sta-http.rule=Host(`localhost`) && PathPrefix(`/sensordata/v1.1`)"
       - "traefik.http.routers.sta-http.entrypoints=web"
       - "traefik.http.services.sta-http.loadbalancer.server.port=8080"
       - "traefik.http.middlewares.sta-contextpath-rewrite.replacepathregex.regex=^/sensordata/(.*)"
       - "traefik.http.middlewares.sta-contextpath-rewrite.replacepathregex.replacement=/FROST-Server/$$1"
-      - "traefik.http.routers.sta-http.middlewares=sta-contextpath-rewrite"
+      - "traefik.http.routers.sta-http.middlewares=n52-ipallowlist,sta-ratelimit,sta-contextpath-rewrite"
       - "traefik.http.routers.sta-http.service=sta-http"
       # Native MQTT (TCP)
       - "traefik.tcp.routers.sta-mqtt-native.rule=HostSNI(`*`)"
       - "traefik.tcp.routers.sta-mqtt-native.entrypoints=mqtt-native"
       - "traefik.tcp.routers.sta-mqtt-native.service=sta-mqtt-native"
       - "traefik.tcp.services.sta-mqtt-native.loadbalancer.server.port=1883"
+      - "traefik.tcp.routers.sta-mqtt-native.middlewares=n52-ipallowlist"
       # MQTT WebSockets (HTTP)
       - "traefik.http.routers.sta-mqtt-websocket.entrypoints=mqtt-websocket"
       - "traefik.http.routers.sta-mqtt-websocket.service=sta-mqtt-websocket"
-      - "traefik.http.routers.sta-mqtt-websocket.middlewares=sta-contextpath-rewrite"
+      - "traefik.http.routers.sta-mqtt-websocket.middlewares=n52-ipallowlist,sta-ratelimit,sta-contextpath-rewrite"
       - "traefik.http.services.sta-mqtt-websocket.loadbalancer.server.port=9876"
     depends_on:
       sta-db:
