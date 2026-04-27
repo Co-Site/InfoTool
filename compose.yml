@@ -70,6 +70,13 @@ services:
       - "--api.dashboard=true"
       - "--api.insecure=true"
       - "--ping=true"
+      # DEBUG, INFO, WARN, ERROR
+      - "--log.level=DEBUG"
+      - "--accesslog=true"
+      # NOT IN PRODUCTION
+      # NOT IN PRODUCTION
+      # NOT IN PRODUCTION
+      - "--accesslog.fields.names.ClientUsername=keep"
     labels:
     #
     # Shared traefik middlewares
