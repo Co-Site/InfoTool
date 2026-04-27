@@ -286,6 +286,7 @@ services:
       - "traefik.tcp.services.sta-mqtt-native.loadbalancer.server.port=1883"
       - "traefik.tcp.routers.sta-mqtt-native.middlewares=n52-ipallowlist"
       # MQTT WebSockets (HTTP)
+      - "traefik.http.routers.sta-mqtt-websocket.rule=Host(`localhost`) && PathPrefix(`/sensordata/mqtt`)"
       - "traefik.http.routers.sta-mqtt-websocket.entrypoints=mqtt-websocket"
       - "traefik.http.routers.sta-mqtt-websocket.service=sta-mqtt-websocket"
       - "traefik.http.routers.sta-mqtt-websocket.middlewares=n52-ipallowlist,sta-ratelimit,sta-contextpath-rewrite"
