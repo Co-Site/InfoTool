@@ -84,14 +84,10 @@ services:
       - cms:/var/www/html
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cms-router.rule=Host(`localhost`) && PathPrefix(`/infotool`)"
+      - "traefik.http.routers.cms-router.rule=Host(`localhost`)"
       - "traefik.http.routers.cms-router.entrypoints=web"
-      - "traefik.http.routers.cms-router.middlewares=cms-add-slash,cms-strip"
-      - "traefik.http.middlewares.cms-strip.stripprefix.prefixes=/infotool/"
-      - "traefik.http.middlewares.cms-add-slash.redirectregex.regex=^(https?://[^/]+)/infotool$$"
-      - "traefik.http.middlewares.cms-add-slash.redirectregex.replacement=$${1}/infotool/"
-      - "traefik.http.middlewares.cms-add-slash.redirectregex.permanent=true"
-      # TODO: active next three lines, if new context path is working/to be tested
+      # TODO: needs to be on other service, that listens to cosite.thk.52north.org
+      #       active next three lines, if new context path is working/to be tested
       #- "traefik.http.routers.cms-router.middlewares=root-redirect"
       #- "traefik.http.middlewares.root-redirect.redirectregex.regex=^https?://([^/]+)/$$"
       #- "traefik.http.middlewares.root-redirect.redirectregex.replacement=https://$${1}/infotool/"
