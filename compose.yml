@@ -10,7 +10,7 @@ x-common-django:
     dockerfile: Dockerfile
     args:
       - BASE_IMAGE_VERSION=${GEONODE_BASE_IMAGE_VERSION}
-  restart: always
+  restart: unless-stopped
   extra_hosts:
     - "host.docker.internal:host-gateway"
   env_file: .env
@@ -44,7 +44,7 @@ services:
   app-proxy:
     image: traefik:${TRAEFIK_IMAGE_VERSION}
     container_name: app-prox4${COMPOSE_PROJECT_NAME}
-    restart: always
+    restart: unless-stopped
     command:
       - "--providers.docker"
       - "--providers.docker.exposedbydefault=false"
@@ -128,7 +128,7 @@ services:
       - RESOLVER=127.0.0.11
     volumes:
       - statics:/mnt/volumes/statics
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: >
         curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:80/nginx-health
@@ -294,6 +294,7 @@ services:
     depends_on:
       sta-db:
         condition: service_healthy
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/FROST-Server/"]
       start_period: 20s
@@ -312,6 +313,7 @@ services:
     env_file: .env.sta
     volumes:
       - sta-dbdata:/var/lib/postgresql/data
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -q -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-postgres}"]
       start_period: 30s
