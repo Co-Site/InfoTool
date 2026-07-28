@@ -73,6 +73,7 @@ services:
       # DEBUG, INFO, WARN, ERROR
       - "--log.level=DEBUG"
       - "--accesslog=true"
+      - "--accesslog.bufferingsize=0"
       # NOT IN PRODUCTION
       # NOT IN PRODUCTION
       # NOT IN PRODUCTION
@@ -106,7 +107,68 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
+  #
+  #   CMS
+  #
+  # before adding CMS, activate the according volumes in compose-volumes_infotool.yml
+  cms:
+    # source: https://hub.docker.com/_/wordpress
+    image: wordpress:${WORDPRESS_IMAGE_VERSION}
+    container_name: cms4${COMPOSE_PROJECT_NAME}
+    restart: always
+    env_file:
+      - .env.cms
+    volumes:
+      - ./docker/wordpress/000-default.conf:/etc/apache2/sites-available/000-default.conf:ro
+      - cms:/var/www/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cms-router.rule=Host(`localhost`)"
+      - "traefik.http.routers.cms-router.entrypoints=web"
+      # TODO: needs to be on other service, that listens to cosite.thk.52north.org
+      #       active next three lines, if new context path is working/to be tested
+      #- "traefik.http.routers.cms-router.middlewares=root-redirect"
+      #- "traefik.http.middlewares.root-redirect.redirectregex.regex=^https?://([^/]+)/$$"
+      #- "traefik.http.middlewares.root-redirect.redirectregex.replacement=https://$${1}/infotool/"
+      - "traefik.http.services.cms-service.loadbalancer.server.port=80"
+    depends_on:
+      cms-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--user-agent", "CoSiteDockerHealthCheck", "--fail", "--silent", "--write-out", "HTTP CODE : %{http_code}\n", "--output", "/dev/null", "http://127.0.0.1:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+  cms-cli:
+    # source: https://hub.docker.com/_/wordpress#wordpresscli
+    image: wordpress:${WORDPRESS_CLI_IMAGE_VERSION}
+    user: "33:33"
+    volumes:
+      - cms:/var/www/html
+    env_file:
+      - .env.cms
+    depends_on:
+      - cms-db
+    profiles:
+      - tools
+  cms-db:
+    image: mariadb:11.4.10
+    container_name: cms-db4${COMPOSE_PROJECT_NAME}
+    restart: always
+    env_file:
+      - .env.cms
+    volumes:
+      - cms-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+  #
+  #   GEONODE
+  #
   # Nginx is serving django static and media files and proxies to django and geonode
   geonode:
     image: ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${COMPOSE_PROJECT_NAME}_nginx:${NGINX_BASE_IMAGE_VERSION}-${PROJECT_VERSION}
@@ -142,7 +204,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
   # Our custom django application. It includes Geonode.
   django:
     << : *default-common-django
@@ -258,7 +319,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
   #
   # STA
   # → HTTP /sensordata/

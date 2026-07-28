@@ -19,3 +19,7 @@ volumes:
     name: ${COMPOSE_PROJECT_NAME}-app-proxy
   sta-dbdata:
     name: ${COMPOSE_PROJECT_NAME}-sta-dbdata
+  cms:
+    name: ${COMPOSE_PROJECT_NAME}-cms
+  cms-db:
+    name: ${COMPOSE_PROJECT_NAME}-cms-db
