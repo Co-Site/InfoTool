@@ -165,3 +165,17 @@ As a workaround, a post start command is added to the [devcontainer.json](.devco
   "/usr/src/geonode/entrypoint.sh && python manage.py dbshell -- -c \"UPDATE public.base_hierarchicalkeyword SET path = '0001' WHERE slug = 'subsite_exclusive' AND (path IS NULL OR path = '')\""
 ]
 ```
+
+# External applications
+
+## Umwelt-Monitoring Dashboard
+
+As part of the InfoTool environment, the [COSITE dashboard](https://github.com/Co-Site/cosite-dashboard) runs at
+`/umwelt-monitoring/`. It is deployed from its own repository with its own compose file.
+
+From this compose setup, the dashboard only needs:
+
+- the Traefik instance (`app-proxy`), which routes to the dashboard and provides TLS
+- the network `cosite_default` (the default network of this compose project with `COMPOSE_PROJECT_NAME=cosite`), which the dashboard joins as an external network
+
+So this compose setup has to be running before the dashboard is started. Everything else (image, nginx, Traefik labels, proxy) is in the dashboard repository, see its [deployment documentation](https://github.com/Co-Site/cosite-dashboard/blob/main/docs/Deployment.md).
